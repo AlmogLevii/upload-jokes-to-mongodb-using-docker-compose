@@ -1,0 +1,18 @@
+services:
+  my-database:
+    image: mongo
+    ports:
+    - "27017:27017"
+    volumes:
+    - /var/lib/mongodb:/data/db:Z
+    healthcheck:
+        test: echo 'db.runCommand("ping").ok' | mongo my-database:27017/test --quiet
+        interval: 10s
+        timeout: 10s
+        retries: 5
+        start_period: 40s
+  my-app:
+    build: .
+    depends_on:
+      my-database:
+        condition: service_healthy
